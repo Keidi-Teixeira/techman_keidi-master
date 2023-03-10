@@ -1,8 +1,11 @@
 package com.crud.application.views.equipamentos;
 
+import com.crud.application.components.appnav.StreamToByteArrayConverter;
+import com.crud.application.components.appnav.UploadField;
 import com.crud.application.data.entity.Equipamentos;
 import com.crud.application.data.service.EquipamentosService;
 import com.crud.application.views.MainLayout;
+import com.google.common.io.ByteStreams;
 import com.sun.jna.StringArray;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -110,30 +113,18 @@ public class EquipamentoView extends VerticalLayout {
 
             var cbAtivo = new Checkbox("Ativo");
 
-            final String[] logo = new String[1];
-            MemoryBuffer buffer = new MemoryBuffer();
-            Upload upload = new Upload(buffer);
-            upload.setAcceptedFileTypes("image/png");
-            upload.addSucceededListener(event -> {
-                try {
-                    String base64 = processUpload(
-                            buffer.getInputStream()
-                    );
-                     logo[0] = base64;
-                } catch (IOException e) {
-                    // lidar com a exceção
-                }
-            });
+            UploadField uploadField = new UploadField();
 
-            //binder.forField(logo)
-            //        .bind(Equipamentos::getImagem, Equipamentos::setImagem);
-
+            //testar muito
+            binder.forField(uploadField)
+                    .withConverter(new StreamToByteArrayConverter())
+                    .bind(Equipamentos::getImagem, Equipamentos::setImagem);
 
             binder.forField(cbAtivo)
                     .bind(Equipamentos::getAtivo, Equipamentos::setAtivo);
 
             binder.forField(txtNome).asRequired()
-                    .withValidator(new StringLengthValidator("O nome deve ter entre 3 e 50 caracteres", 3, 50))
+                    .withValidator(new StringLengthValidator("O nome deve ter entre 3 e 250 caracteres", 3, 250))
                     .bind(Equipamentos::getNome, Equipamentos::setNome);
 
             dateTimePicker.setLabel("Data");
@@ -142,10 +133,6 @@ public class EquipamentoView extends VerticalLayout {
             binder.forField(dateTimePicker).asRequired()
                     .bind(Equipamentos::getData, Equipamentos::setData);
 
-
-            binder.forField(txtNome).asRequired()
-                    .withValidator(new StringLengthValidator("O nome deve ter entre 3 e 50 caracteres", 3, 50))
-                    .bind(Equipamentos::getNome, Equipamentos::setNome);
 
             binder.forField(txtDescricao).asRequired()
                     .withValidator(new StringLengthValidator("A descrição deve ter entre 3 e 250 caracteres", 3, 250))
@@ -156,7 +143,7 @@ public class EquipamentoView extends VerticalLayout {
             binder.setBean(equipamentos);
 
             // Abre o diálogo de edição do equipamentos
-            formLayout.add(txtNome, txtDescricao, cbAtivo, dateTimePicker, upload);
+            formLayout.add(txtNome, txtDescricao, dateTimePicker, uploadField,cbAtivo);
             add(formLayout);
 
             // Configura o diálogo para salvar o objeto Cliente quando o botão 'Salvar' for clicado

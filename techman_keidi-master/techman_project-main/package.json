@@ -259,9 +259,9 @@
     "lit": "$lit",
     "@polymer/polymer": "$@polymer/polymer",
     "proj4": "$proj4",
+    "date-fns": "$date-fns",
     "line-awesome": "$line-awesome",
-    "@vaadin-component-factory/vcf-nav": "$@vaadin-component-factory/vcf-nav",
-    "date-fns": "$date-fns"
+    "@vaadin-component-factory/vcf-nav": "$@vaadin-component-factory/vcf-nav"
   },
   "vaadin": {
     "dependencies": {
