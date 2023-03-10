@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/techman_keidi-master/techman_project-main/techman.iml" filepath="$PROJECT_DIR$/techman_keidi-master/techman_project-main/techman.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/techman_keidi-master.iml" filepath="$PROJECT_DIR$/.idea/techman_keidi-master.iml" />
+    </modules>
+  </component>
+</project>
