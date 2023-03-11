@@ -34,5 +34,15 @@ Once the JAR file is built, you can run it using
 
 ![Diagrama entidade relacionamento](https://user-images.githubusercontent.com/99774507/224511658-c844ba90-af0d-4bcc-bb68-85321cee129d.jpg)
 ![image](https://user-images.githubusercontent.com/99774507/224511676-fb4d2106-539c-44d6-a80c-e0b2afd270cf.png)
+![image](https://user-images.githubusercontent.com/99774507/224511741-7c5a610a-f0de-4d32-beda-4dac8117e307.png)
+![image](https://user-images.githubusercontent.com/99774507/224511777-89b74d60-eaff-48bc-a60e-575cd995513d.png)
+![image](https://user-images.githubusercontent.com/99774507/224511783-1e7fcac4-8165-476d-89b5-046ba453a054.png)
+![image](https://user-images.githubusercontent.com/99774507/224511790-f737d5f0-5cda-44b1-9547-e85cfb7292e4.png)
+![image](https://user-images.githubusercontent.com/99774507/224511801-9b6c0c34-98ad-47eb-9315-93b16b1e6384.png)
+![image](https://user-images.githubusercontent.com/99774507/224511829-46f7e40e-26b3-4ace-a6b0-a08a17c02726.png)
+![image](https://user-images.githubusercontent.com/99774507/224511843-d16b2240-dd8d-44bc-be7d-455faef0e889.png)
+
+
+
 
 
