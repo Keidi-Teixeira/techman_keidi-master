@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +45,15 @@ public class EquipamentosService {
     public void salvar(Equipamentos cliente) {
         repository.save(cliente);
     }
+
     public int count() {
         return (int) repository.count();
     }
+    public Equipamentos salvar(Equipamentos equipamentos, String fileName, byte[] fileBytes) throws IOException {
+        equipamentos.setImagem(fileBytes);
+        Equipamentos equipamentosSalvo = repository.save(equipamentos);
+        return equipamentosSalvo;
+    }
+
+
 }

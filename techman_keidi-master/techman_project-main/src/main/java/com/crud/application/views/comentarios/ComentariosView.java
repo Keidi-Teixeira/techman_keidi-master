@@ -34,6 +34,7 @@ import com.vaadin.flow.router.RouteAlias;
 
 import javax.annotation.security.PermitAll;
 import java.io.Serial;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -114,21 +115,17 @@ public class ComentariosView extends VerticalLayout {
                         .withValidator(new StringLengthValidator("O comentário deve ter entre 3 e 250 caracteres", 3, 50))
                         .bind(Comentarios::getComentario, Comentarios::setComentario);
 
-                DateTimePicker dateTimePicker = new DateTimePicker();
-                dateTimePicker.setLabel("Data");
-                add(dateTimePicker);
-
-                binder.forField(dateTimePicker).asRequired()
-                        .bind(Comentarios::getDataComentario, Comentarios::setDataComentario);
-
                 binder.setBean(comentarios);
 
                 // Abre o diálogo de edição do equipamentos
-                formLayout.add(txtNome, dateTimePicker, cbEquipamentos, cbUser);
+                formLayout.add(txtNome, cbEquipamentos, cbUser);
                 add(formLayout);
 
                 // Configura o diálogo para salvar o objeto Cliente quando o botão 'Salvar' for clicado
                 Button btnSalvar = new Button("Salvar", evento -> {
+                    if (comentarios.getId() == null) {
+                        comentarios.setDataComentario(LocalDateTime.now());
+                    }
                     if (binder.writeBeanIfValid(comentarios)) {
                         consumer.accept(comentarios);
                         comentariosService.salvar(comentarios);

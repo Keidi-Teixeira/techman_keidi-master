@@ -1,17 +1,13 @@
 package com.crud.application.views.equipamentos;
 
-import com.crud.application.components.appnav.StreamToByteArrayConverter;
 import com.crud.application.components.appnav.UploadField;
 import com.crud.application.data.entity.Equipamentos;
 import com.crud.application.data.service.EquipamentosService;
 import com.crud.application.views.MainLayout;
-import com.google.common.io.ByteStreams;
-import com.sun.jna.StringArray;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -23,8 +19,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.StringLengthValidator;
@@ -32,12 +26,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.StreamResource;
-import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.util.unit.DataSize;
 
 import javax.annotation.security.PermitAll;
 import java.io.*;
-import java.util.Base64;
-import java.util.concurrent.atomic.AtomicReference;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 @PageTitle("Equipamentos")
@@ -94,10 +87,7 @@ public class EquipamentoView extends VerticalLayout {
         });
         add(btnAdicionar, grid);
     }
-    public static String processUpload(InputStream inputStream) throws IOException {
-        byte[] bytes = IOUtils.toByteArray(inputStream); // use a biblioteca Apache Commons IO para converter o InputStream em um array de bytes
-        return Base64.getEncoder().encodeToString(bytes);
-    }
+
     static class EquipamentosFormDialog extends Dialog {
         @Serial
         private static final long serialVersionUID = 6055099001923416653L;
@@ -108,17 +98,15 @@ public class EquipamentoView extends VerticalLayout {
             Binder<Equipamentos> binder = new Binder<>(Equipamentos.class);
 
             TextField txtNome = new TextField("Nome");
+
             TextField txtDescricao = new TextField("Descrição");
-            DateTimePicker dateTimePicker = new DateTimePicker();
 
             var cbAtivo = new Checkbox("Ativo");
 
-            UploadField uploadField = new UploadField();
-
-            //testar muito
-            binder.forField(uploadField)
-                    .withConverter(new StreamToByteArrayConverter())
-                    .bind(Equipamentos::getImagem, Equipamentos::setImagem);
+            final UploadField upload = new UploadField().withMaxFiles(1).withMaxFileSize((int) DataSize.ofMegabytes(25).toBytes());
+            if (equipamentos.getId() == null) {
+                formLayout.add(upload, 5);
+            }
 
             binder.forField(cbAtivo)
                     .bind(Equipamentos::getAtivo, Equipamentos::setAtivo);
@@ -127,42 +115,36 @@ public class EquipamentoView extends VerticalLayout {
                     .withValidator(new StringLengthValidator("O nome deve ter entre 3 e 250 caracteres", 3, 250))
                     .bind(Equipamentos::getNome, Equipamentos::setNome);
 
-            dateTimePicker.setLabel("Data");
-            add(dateTimePicker);
-
-            binder.forField(dateTimePicker).asRequired()
-                    .bind(Equipamentos::getData, Equipamentos::setData);
-
-
             binder.forField(txtDescricao).asRequired()
                     .withValidator(new StringLengthValidator("A descrição deve ter entre 3 e 250 caracteres", 3, 250))
                     .bind(Equipamentos::getDescricao, Equipamentos::setDescricao);
 
-
-            // Define o objeto que será editado pelo formulário
             binder.setBean(equipamentos);
 
-            // Abre o diálogo de edição do equipamentos
-            formLayout.add(txtNome, txtDescricao, dateTimePicker, uploadField,cbAtivo);
+            formLayout.add(txtNome, txtDescricao,cbAtivo);
             add(formLayout);
 
-            // Configura o diálogo para salvar o objeto Cliente quando o botão 'Salvar' for clicado
-            Button btnSalvar = new Button("Salvar", evento -> {
+            Button btnSave = new Button("Salvar", event -> {
                 if (binder.writeBeanIfValid(equipamentos)) {
-                    consumer.accept(equipamentos);
-                    equipamentosService.salvar(equipamentos);
-                    close();
-                } else {
-                    Notification.show("Preencha todos os campos corretamente.");
+                    if (equipamentos.getId() == null) {
+                        equipamentos.setData(LocalDateTime.now());
+                    }
+                    try (InputStream is = upload.getInputStream()) {
+                        consumer.accept(equipamentosService.salvar(equipamentos, upload.getFileName(), is.readAllBytes()));
+                        this.close();
+                    } catch (IllegalArgumentException | IllegalStateException error) {
+                        Notification.show(error.getMessage());
+                    } catch (Exception ex) {
+                        Notification.show("Erro desconhecido " + ex);
+                    }
                 }
             });
 
             Button cancelButton = new Button("Cancelar", e -> close());
 
-            getFooter().add(btnSalvar);
+            getFooter().add(btnSave);
             getFooter().add(cancelButton);
 
-            // Abre o diálogo
             open();
         }
     }
